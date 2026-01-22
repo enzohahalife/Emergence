@@ -1,31 +1,22 @@
 import FeedManager from './components/FeedManager';
 import { RSWEntry } from './types';
+import { getAllNotionEntries } from './lib/notion';
+import { DEFAULT_FIELD_MAPPING } from './lib/notion-config';
 
-interface ApiResponse {
-  results: RSWEntry[];
-  next: string | null;
-}
-
-// Fetch all entries (handling pagination)
+// Fetch all entries from Notion
 async function getAllEntries(): Promise<RSWEntry[]> {
-  let allResults: RSWEntry[] = [];
-  let nextUrl: string | null = 'https://api.getmatter.com/tools/api/rsw_entries/';
-
   try {
-    while (nextUrl) {
-      const res = await fetch(nextUrl, { next: { revalidate: 3600 } });
-      if (!res.ok) throw new Error('Failed to fetch data');
-      const data: ApiResponse = await res.json();
-      allResults = [...allResults, ...data.results];
-      nextUrl = data.next;
-    }
-    // Sort by ID descending (newest first based on ID)
-    allResults.sort((a, b) => b.id - a.id);
-  } catch (error) {
-    console.error('Error fetching entries:', error);
-  }
+    // Use the default field mapping
+    const entries = await getAllNotionEntries();
 
-  return allResults;
+    // If you need custom field mapping, use this instead:
+    // const entries = await getAllNotionEntriesWithMapping(DEFAULT_FIELD_MAPPING);
+
+    return entries;
+  } catch (error) {
+    console.error('Error fetching entries from Notion:', error);
+    return [];
+  }
 }
 
 export default async function Home() {

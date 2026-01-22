@@ -4,6 +4,29 @@
   height: 100vh;
   overflow: hidden;
   background: var(--background);
+  position: relative;
+}
+
+.backgroundImage {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  animation: backgroundFade 0.6s ease;
+}
+
+.backgroundOverlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 45%),
+    linear-gradient(180deg, rgba(12, 12, 12, 0.7), rgba(12, 12, 12, 0.85));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .mainScroll {
@@ -12,6 +35,9 @@
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
+  position: relative;
+  z-index: 2;
+  background: transparent;
 }
 
 /* Hide scrollbar for main scroll if desired, or verify if user wants it active */
@@ -20,4 +46,13 @@
 }
 .mainScroll::-webkit-scrollbar-thumb {
   background: #333;
+}
+
+@keyframes backgroundFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

@@ -12,7 +12,9 @@ interface SidebarProps {
 export default function Sidebar({ entries, activeId, onSelect }: SidebarProps) {
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.logo}>Read Something Wonderful</div>
+      <div className={styles.logo}>
+        Read Something Wonderful
+      </div>
       <nav className={styles.nav}>
         {entries.map((entry) => (
           <button
