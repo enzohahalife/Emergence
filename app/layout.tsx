@@ -14,8 +14,38 @@ const merriweather = Merriweather({
 });
 
 export const metadata: Metadata = {
-  title: "Read Something Wonderful",
-  description: "A collection of wonderful things to read.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://your-domain.com'),
+  title: {
+    default: "涌现阅览室",
+    template: "%s | 涌现阅览室",
+  },
+  description: "知识止步于此，行动始于涌现",
+  keywords: ['涌现阅览室', '涌现', 'yxlab', '阅览室'],
+  authors: [{ name: '涌现阅览室' }],
+  creator: '涌现阅览室',
+  openGraph: {
+    type: 'website',
+    locale: 'zh_CN',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://your-domain.com',
+    siteName: '涌现阅览室',
+    title: '涌现阅览室',
+    description: '知识止步于此，行动始于涌现',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    creator: process.env.NEXT_PUBLIC_TWITTER_HANDLE || '@your_twitter',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -24,7 +54,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body className={`${inter.variable} ${merriweather.variable} antialiased`}>
         {children}
       </body>

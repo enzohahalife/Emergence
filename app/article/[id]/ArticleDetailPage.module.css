@@ -1,0 +1,672 @@
+/* 文章详情页样式 */
+.container {
+  min-height: 100vh;
+  height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.navigation {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.backLink {
+  color: rgba(0, 0, 0, 0.8);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.backLink:hover {
+  color: rgba(0, 0, 0, 1);
+}
+
+.navControls {
+  display: flex;
+  gap: 1rem;
+}
+
+.navLink {
+  color: rgba(0, 0, 0, 0.7);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.navLink:hover {
+  color: rgba(0, 0, 0, 1);
+}
+
+/* 主要内容区域 - 使用 flex 布局 */
+.contentWrapper {
+  display: flex;
+  flex: 1;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  align-items: flex-start;
+}
+
+.main {
+  flex: 1;
+  max-width: 800px;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+.article {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  max-height: none;
+  overflow: visible;
+}
+
+.header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 2rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  color: #1a1a1a;
+  font-family: var(--font-merriweather);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.author,
+.date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.content {
+  margin: 2rem 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.articleContent {
+  line-height: 1.8;
+  font-size: 1.1rem;
+  color: #333;
+  max-height: none;
+  overflow: visible;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.paragraph {
+  margin-bottom: 1.5rem;
+  text-align: justify;
+}
+
+/* 内联格式样式 */
+.paragraph strong,
+.strong {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.paragraph em,
+.emphasis {
+  font-style: italic;
+  color: #4a5568;
+}
+
+.paragraph code,
+.inlineCode {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9em;
+  color: #e53e3e;
+}
+
+.paragraph del,
+.strikethrough {
+  text-decoration: line-through;
+  color: #a0aec0;
+}
+
+/* 链接样式 */
+.link {
+  color: #667eea;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.link:hover {
+  color: #5a67d8;
+  border-bottom-color: #5a67d8;
+}
+
+/* 图片样式 */
+.image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 图片样式 */
+.image {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: block;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.image:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* 图片加载状态 */
+.image[loading="lazy"] {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 图片容器 */
+.imageContainer {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.imageCaption {
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+.tableWrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.tableHeader {
+  background: #f7fafc;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #2d3748;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.tableCell {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #4a5568;
+}
+
+.table tr:hover {
+  background: #f7fafc;
+}
+
+/* 任务列表样式 */
+.list input[type="checkbox"] {
+  margin-right: 0.5rem;
+  transform: scale(1.2);
+}
+
+/* Markdown 特殊元素样式 */
+.articleContent > * {
+  margin-bottom: 1rem;
+}
+
+.articleContent > *:last-child {
+  margin-bottom: 0;
+}
+
+/* 嵌套列表样式 */
+.articleContent ul ul,
+.articleContent ol ol,
+.articleContent ul ol,
+.articleContent ol ul {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 引用内的段落 */
+.blockquote p {
+  margin-bottom: 0.5rem;
+}
+
+.blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* 代码块滚动条样式 */
+.codeBlock::-webkit-scrollbar {
+  height: 8px;
+}
+
+.codeBlock::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.codeBlock::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.codeBlock::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 标题样式 */
+.heading1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 2rem 0 1rem 0;
+  color: #1a1a1a;
+  border-bottom: 2px solid #e1e5e9;
+  padding-bottom: 0.5rem;
+}
+
+.heading2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 1.8rem 0 1rem 0;
+  color: #2d3748;
+}
+
+.heading3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.8rem 0;
+  color: #4a5568;
+}
+
+.heading4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 1.2rem 0 0.6rem 0;
+  color: #4a5568;
+}
+
+.heading5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem 0;
+  color: #718096;
+}
+
+.heading6 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0.8rem 0 0.4rem 0;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* 引用样式 */
+.blockquote {
+  border-left: 4px solid #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  margin: 1.5rem 0;
+  padding: 1rem 1.5rem;
+  font-style: italic;
+  color: #4a5568;
+  border-radius: 0 8px 8px 0;
+}
+
+/* 列表样式 */
+.list {
+  margin: 1rem 0 1.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.list li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.list ul,
+.list ol {
+  margin: 0.5rem 0;
+}
+
+.listItem {
+  display: list-item;
+  margin: 0.5rem 0;
+  line-height: 1.6;
+}
+
+.bullet {
+  color: #667eea;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+
+.number {
+  color: #667eea;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+  min-width: 1.5rem;
+}
+
+/* 代码块样式 */
+.codeBlock {
+  background: #f8f9fa !important;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  position: relative;
+}
+
+.codeBlock code {
+  background: none !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: inherit;
+  color: inherit;
+  font-family: inherit;
+}
+
+.codeBlock pre {
+  margin: 0;
+  padding: 0;
+  background: none;
+  overflow: visible;
+}
+
+/* 代码高亮覆盖样式 */
+.codeBlock .hljs {
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.codeBlockMarker {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0.5rem 0;
+  font-style: italic;
+}
+
+/* 特殊内容块样式 */
+.callout {
+  background: rgba(102, 126, 234, 0.05);
+  border-left: 4px solid #667eea;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 0 8px 8px 0;
+  font-weight: 500;
+}
+
+/* 分割线样式 */
+.divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+  margin: 2rem 0;
+}
+
+/* 原文链接样式 */
+.originalLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border: 1px solid #667eea;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.originalLink:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* 键盘快捷键提示 */
+.keyboardHints {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: white;
+  z-index: 50;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.keyboardHints:hover {
+  opacity: 1;
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.hint kbd {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+  font-family: monospace;
+  font-size: 0.7rem;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+/* 移动端隐藏键盘提示 */
+@media (max-width: 768px) {
+  .keyboardHints {
+    display: none;
+  }
+}
+
+/* 确保目录按钮不被其他元素遮挡 */
+.container {
+  position: relative;
+}
+
+.noContent {
+  text-align: center;
+  padding: 3rem 0;
+  color: #666;
+  font-style: italic;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.readButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.readButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .contentWrapper {
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navigation {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .navControls {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .contentWrapper {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .main {
+    max-width: none;
+  }
+
+  .article {
+    padding: 2rem 1.5rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .articleContent {
+    font-size: 1rem;
+  }
+
+  .meta {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .article {
+    padding: 1.5rem 1rem;
+  }
+
+  .articleContent {
+    font-size: 0.95rem;
+  }
+}
+
+/* 滚动条样式优化 */
+.main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.main::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.main::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.main::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 确保内容完整显示 */
+.container {
+  scroll-behavior: smooth;
+}
+
+/* 内容区域优化 */
+.articleContent > * {
+  margin-bottom: 1rem;
+}
+
+.articleContent > *:last-child {
+  margin-bottom: 0;
+}

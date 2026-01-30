@@ -27,29 +27,35 @@ export interface ArticleSEO {
 
 // 默认 SEO 配置
 export const DEFAULT_SEO_CONFIG: SEOConfig = {
-  siteName: 'Read Something Wonderful',
-  siteUrl: 'https://your-domain.com', // 请替换为实际域名
-  defaultTitle: 'Read Something Wonderful - 精选文章推荐',
-  defaultDescription: '发现值得阅读的精彩文章，涵盖技术、设计、创业等多个领域的深度内容。',
+  siteName: '涌现阅览室',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://your-domain.com', // 从环境变量读取，或使用默认值
+  defaultTitle: '涌现阅览室',
+  defaultDescription: '知识止步于此，行动始于涌现',
   defaultImage: '/og-image.jpg', // 请添加默认的 OG 图片
-  twitterHandle: '@your_twitter', // 请替换为实际 Twitter 账号
-  author: 'Read Something Wonderful',
-  keywords: ['阅读', '文章推荐', '技术', '设计', '创业', '深度内容'],
+  twitterHandle: process.env.NEXT_PUBLIC_TWITTER_HANDLE || '@your_twitter', // 从环境变量读取
+  author: '涌现阅览室',
+  keywords: ['涌现阅览室', '涌现', 'yxlab', '阅览室'],
 };
 
 // 从 RSWEntry 生成 SEO 数据
 export function generateArticleSEO(entry: RSWEntry, config: SEOConfig = DEFAULT_SEO_CONFIG): ArticleSEO {
-  // 生成文章描述
-  const description = generateDescription(entry, config);
+  // 优先使用 Notion 中的 SEO 字段，如果没有则自动生成
+  const title = entry.seo_title 
+    ? `${entry.seo_title} | ${config.siteName}`
+    : `${entry.title} | ${config.siteName}`;
 
-  // 生成关键词
-  const keywords = generateKeywords(entry, config);
+  const description = entry.seo_description || generateDescription(entry, config);
+
+  // 合并 Notion 中的关键词和自动生成的关键词
+  const notionKeywords = entry.keywords || [];
+  const autoKeywords = generateKeywords(entry, config);
+  const keywords = [...new Set([...notionKeywords, ...autoKeywords])];
 
   // 生成完整 URL
   const url = `${config.siteUrl}/article/${entry.id}`;
 
   return {
-    title: `${entry.title} | ${config.siteName}`,
+    title,
     description,
     url,
     image: entry.og_image || entry.screenshot || config.defaultImage,
@@ -142,7 +148,7 @@ export function generateStructuredData(seo: ArticleSEO, config: SEOConfig = DEFA
         name: config.siteName,
         logo: {
           '@type': 'ImageObject',
-          url: `${config.siteUrl}/logo.png`,
+          url: `${config.siteUrl}/logo.svg`,
         },
       },
       datePublished: seo.publishedTime,
@@ -170,6 +176,29 @@ export function generateStructuredData(seo: ArticleSEO, config: SEOConfig = DEFA
       },
     };
   }
+}
+
+// 为动态路由页面生成SEO数据（简化版本）
+export function generateSEOData(data: {
+  title: string;
+  description: string;
+  keywords: string[];
+  image: string | null;
+  url: string;
+  author: string | null;
+  publishedTime: string | null;
+  modifiedTime: string | null;
+}, config: SEOConfig = DEFAULT_SEO_CONFIG) {
+  return {
+    title: data.title.includes(config.siteName) ? data.title : `${data.title} | ${config.siteName}`,
+    description: data.description,
+    keywords: data.keywords,
+    image: data.image || config.defaultImage,
+    url: data.url.startsWith('http') ? data.url : `${config.siteUrl}${data.url}`,
+    author: data.author || config.author,
+    publishedTime: data.publishedTime,
+    modifiedTime: data.modifiedTime,
+  };
 }
 
 // 生成 sitemap 数据
