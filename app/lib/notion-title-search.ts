@@ -19,19 +19,14 @@ export async function findNotionPageByTitle(title: string): Promise<string | nul
 
     console.log(`🔍 Searching for page with title: "${title}"`);
 
-<<<<<<< HEAD
     const response = await (notion.databases as any).query({
-=======
-    // 查询数据库，寻找匹配标题的页面
-    const response = await notion.databases.query({
->>>>>>> 5337f35939b524205264f8174cc37e4c69dca242
       database_id: databaseId,
       filter: {
-        property: 'Title', // 假设标题字段名为 'Title'
+        property: 'Title',
         title: {
-          equals: title
-        }
-      }
+          equals: title,
+        },
+      },
     });
 
     if (response.results.length === 0) {
@@ -100,18 +95,14 @@ export async function fetchNotionContentByTitleFuzzy(title: string): Promise<str
       // 如果精确匹配失败，尝试包含匹配
       console.log(`🔍 Trying fuzzy search for: "${title}"`);
 
-<<<<<<< HEAD
       const response = await (notion.databases as any).query({
-=======
-      const response = await notion.databases.query({
->>>>>>> 5337f35939b524205264f8174cc37e4c69dca242
         database_id: databaseId,
         filter: {
           property: 'Title',
           title: {
-            contains: title.split(' ')[0] // 使用标题的第一个词进行模糊匹配
-          }
-        }
+            contains: title.split(' ')[0],
+          },
+        },
       });
 
       if (response.results.length > 0) {
@@ -135,8 +126,4 @@ export async function fetchNotionContentByTitleFuzzy(title: string): Promise<str
     console.error(`❌ Error in fuzzy search for title "${title}":`, error);
     return null;
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 5337f35939b524205264f8174cc37e4c69dca242
