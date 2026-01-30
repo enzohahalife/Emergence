@@ -5,6 +5,7 @@ import { RSWEntry } from '../types';
 import Sidebar from './Sidebar';
 import ArticleSection from './ArticleSection';
 import styles from './FeedManager.module.css';
+import { generateConsistentGradient, applyBackgroundGradient } from '../lib/background-gradient';
 
 interface FeedManagerProps {
   entries: RSWEntry[];
@@ -28,8 +29,6 @@ export default function FeedManager({ entries }: FeedManagerProps) {
   };
 
   const [activeId, setActiveId] = useState<number | null>(null);
-  const [backgroundStyle, setBackgroundStyle] = useState<string | null>(null);
-  const [backgroundKey, setBackgroundKey] = useState(0);
   const mainRef = useRef<HTMLDivElement>(null);
 
   // Set initial activeId after component mounts
@@ -37,26 +36,11 @@ export default function FeedManager({ entries }: FeedManagerProps) {
     setActiveId(getInitialActiveId());
   }, [entries]);
 
-  // Update background image when activeId changes
+  // Update background gradient when activeId changes
   useEffect(() => {
-    if (!activeId) {
-      setBackgroundStyle(null);
-      return;
-    }
-    const activeEntry = entries.find(entry => entry.id === activeId);
-    if (activeEntry) {
-      const imageUrl = activeEntry.screenshot || activeEntry.og_image;
-      if (imageUrl) {
-        setBackgroundStyle(`url(${imageUrl})`);
-        setBackgroundKey((prev) => prev + 1);
-        return;
-      }
-      if (activeEntry.gradient_start && activeEntry.gradient_end) {
-        setBackgroundStyle(`linear-gradient(135deg, ${activeEntry.gradient_start}, ${activeEntry.gradient_end})`);
-        setBackgroundKey((prev) => prev + 1);
-        return;
-      }
-      setBackgroundStyle(null);
+    if (activeId) {
+      const gradient = generateConsistentGradient(activeId);
+      applyBackgroundGradient(gradient);
     }
   }, [activeId, entries]);
 
@@ -104,7 +88,6 @@ export default function FeedManager({ entries }: FeedManagerProps) {
 
   // Handle Sidebar navigation
   const handleSelect = (id: number) => {
-    setActiveId(id);
     const element = document.getElementById(`post-${id}`);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -113,11 +96,6 @@ export default function FeedManager({ entries }: FeedManagerProps) {
 
   return (
     <div className={styles.feedContainer}>
-      <div
-        key={backgroundKey}
-        className={styles.backgroundImage}
-        style={backgroundStyle ? { backgroundImage: backgroundStyle } : undefined}
-      />
       <div className={styles.backgroundOverlay} />
       <Sidebar entries={entries} activeId={activeId} onSelect={handleSelect} />
 

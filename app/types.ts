@@ -3,6 +3,7 @@ export interface RSWEntry {
     id: number;
     url: string;
     title: string;
+    content: string | null;         // 文章内容
     screenshot: string | null;
     og_image: string | null;
     publication_date: string | null;
@@ -12,6 +13,11 @@ export interface RSWEntry {
     recommender_twitter_screen_name: string | null;
     gradient_start: string | null; // Hex color
     gradient_end: string | null;   // Hex color
+
+    // SEO 字段
+    seo_title: string | null;        // SEO 标题
+    seo_description: string | null;  // SEO 描述
+    keywords: string[];              // SEO 关键词
 }
 
 // 新的增强型文章接口
@@ -98,6 +104,7 @@ export function enhancedToLegacy(enhanced: EnhancedArticle): RSWEntry {
         id: enhanced.id,
         url: enhanced.url,
         title: enhanced.title,
+        content: null, // EnhancedArticle doesn't have content field
         screenshot: enhanced.screenshot,
         og_image: enhanced.og_image || enhanced.featured_image,
         publication_date: enhanced.publication_date,
@@ -107,6 +114,9 @@ export function enhancedToLegacy(enhanced: EnhancedArticle): RSWEntry {
         recommender_twitter_screen_name: enhanced.recommender_twitter,
         gradient_start: enhanced.primary_color,
         gradient_end: enhanced.secondary_color,
+        seo_title: enhanced.seo_title,
+        seo_description: enhanced.seo_description,
+        keywords: enhanced.keywords,
     };
 }
 

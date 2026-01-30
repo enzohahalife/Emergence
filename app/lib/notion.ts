@@ -1,12 +1,18 @@
 import { Client } from '@notionhq/client';
 import { RSWEntry } from '../types';
 
-// Initialize Notion client
+// Initialize Notion client with timeout configuration
 const notion = new Client({
   auth: process.env.NOTION_API_TOKEN,
+  timeoutMs: 30000, // 30 seconds timeout
 });
 
 const DATABASE_ID = process.env.NOTION_DATABASE_ID!;
+
+// 添加内存缓存
+let cachedEntries: RSWEntry[] | null = null;
+let cacheTimestamp: number = 0;
+const CACHE_DURATION = 30 * 60 * 1000; // 增加到30分钟缓存
 
 // Helper function to extract text from Notion rich text
 function extractText(richText: any[]): string | null {
@@ -213,6 +219,10 @@ function notionPageToRSWEntry(page: any, fieldMapping?: Record<string, string>):
     author: 'Author',
     date: 'Date',
     image: 'Image',
+    content: 'notion-page-content',
+    seoTitle: 'SEO Title',
+    seoDescription: 'SEO Description',
+    keywords: 'Keywords',
   };
 
   const mapping = fieldMapping || defaultMapping;
@@ -230,6 +240,13 @@ function notionPageToRSWEntry(page: any, fieldMapping?: Record<string, string>):
   const title = extractText(properties[mapping.title]?.title) ||
                 extractText(properties.Title?.title) ||
                 'Untitled';
+
+  // Extract content field
+  const content = extractText(properties[mapping.content]?.rich_text) ||
+                  extractText(properties['notion-page-content']?.rich_text) ||
+                  extractText(properties.Content?.rich_text) ||
+                  extractText(properties.content?.rich_text) ||
+                  null;
 
   // Try multiple image field names
   const imageFiles = properties[mapping.image]?.files ||
@@ -250,10 +267,24 @@ function notionPageToRSWEntry(page: any, fieldMapping?: Record<string, string>):
 
   const imageUrl = extractFileUrl(imageFiles);
 
+  // Extract SEO fields
+  const seoTitle = extractText(properties[mapping.seoTitle]?.rich_text) ||
+                   extractText(properties['SEO Title']?.rich_text) ||
+                   null;
+
+  const seoDescription = extractText(properties[mapping.seoDescription]?.rich_text) ||
+                         extractText(properties['SEO Description']?.rich_text) ||
+                         null;
+
+  const keywords = extractMultiSelect(properties[mapping.keywords]?.multi_select) ||
+                   extractMultiSelect(properties.Keywords?.multi_select) ||
+                   [];
+
   return {
     id,
     url,
     title,
+    content,
     screenshot: imageUrl,
     og_image: imageUrl,
     publication_date: publicationDate,
@@ -263,6 +294,9 @@ function notionPageToRSWEntry(page: any, fieldMapping?: Record<string, string>):
     recommender_twitter_screen_name: null,
     gradient_start: null,
     gradient_end: null,
+    seo_title: seoTitle,
+    seo_description: seoDescription,
+    keywords: keywords,
   };
 }
 
@@ -333,50 +367,88 @@ export async function getAllEnhancedArticles(fieldMapping?: Record<string, strin
   }
 }
 export async function getAllNotionEntries(fieldMapping?: Record<string, string>): Promise<RSWEntry[]> {
-  try {
-    const entries: RSWEntry[] = [];
-    let cursor: string | undefined = undefined;
+  // 检查缓存（除非强制刷新）
+  const now = Date.now();
+  const forceRefresh = process.env.FORCE_REFRESH === 'true';
 
-    // Use frontend-matched mapping by default
-    const mapping = fieldMapping || (await import('./notion-config')).FRONTEND_MATCHED_MAPPING;
+  if (!forceRefresh && cachedEntries && (now - cacheTimestamp) < CACHE_DURATION) {
+    console.log(`📦 Using cached data (${Math.round((CACHE_DURATION - (now - cacheTimestamp)) / 1000)}s remaining)`);
+    return cachedEntries;
+  }
 
-    do {
-      let response;
+  if (forceRefresh) {
+    console.log('🔄 Force refresh enabled, bypassing cache');
+  }
 
-      try {
-        // Method 1: Try the standard databases.query method
-        if (typeof (notion.databases as any).query === 'function') {
-          response = await (notion.databases as any).query({
-            database_id: DATABASE_ID,
-            start_cursor: cursor,
-            page_size: 100,
-            // No filter or sort to avoid field name issues
-          });
-        } else {
-          throw new Error('databases.query method not available');
-        }
+  // 添加重试机制
+  const maxRetries = 3;
+  let lastError: Error | null = null;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`🔄 Notion API attempt ${attempt}/${maxRetries}`);
+
+      const entries: RSWEntry[] = [];
+      let cursor: string | undefined = undefined;
+
+      // Use frontend-matched mapping by default
+      const mapping = fieldMapping || (await import('./notion-config')).FRONTEND_MATCHED_MAPPING;
+
+      do {
+        let response;
+
+        try {
+          // Method 1: Try the standard databases.query method with timeout
+          if (typeof (notion.databases as any).query === 'function') {
+            const queryPromise: Promise<any> = (notion.databases as any).query({
+              database_id: DATABASE_ID,
+              start_cursor: cursor,
+              page_size: 20, // 进一步减少页面大小
+              // No filter or sort to avoid field name issues
+            });
+
+            // 增加超时时间
+            const timeoutPromise = new Promise((_, reject) => {
+              setTimeout(() => reject(new Error('Notion API timeout')), 45000);
+            });
+
+            response = await Promise.race([queryPromise, timeoutPromise]);
+          } else {
+            throw new Error('databases.query method not available');
+          }
       } catch (method1Error) {
         // Method 2: Try direct API call with minimal query
-        const apiResponse: Response = await fetch(`https://api.notion.com/v1/databases/${DATABASE_ID}/query`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.NOTION_API_TOKEN}`,
-            'Content-Type': 'application/json',
-            'Notion-Version': '2022-06-28',
-          },
-          body: JSON.stringify({
-            start_cursor: cursor,
-            page_size: 100,
-            // No filter or sort to avoid field name issues
-          }),
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30秒超时
 
-        if (!apiResponse.ok) {
-          const errorText = await apiResponse.text();
-          throw new Error(`HTTP ${apiResponse.status}: ${errorText}`);
+        try {
+          const apiResponse: Response = await fetch(`https://api.notion.com/v1/databases/${DATABASE_ID}/query`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${process.env.NOTION_API_TOKEN}`,
+              'Content-Type': 'application/json',
+              'Notion-Version': '2022-06-28',
+            },
+            body: JSON.stringify({
+              start_cursor: cursor,
+              page_size: 50, // 减少页面大小以提高稳定性
+              // No filter or sort to avoid field name issues
+            }),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!apiResponse.ok) {
+            const errorText = await apiResponse.text();
+            throw new Error(`HTTP ${apiResponse.status}: ${errorText}`);
+          }
+
+          response = await apiResponse.json();
+        } catch (fetchError) {
+          clearTimeout(timeoutId);
+          throw fetchError;
         }
-
-        response = await apiResponse.json();
       }
 
       // Convert Notion pages to RSWEntry objects
@@ -388,14 +460,61 @@ export async function getAllNotionEntries(fieldMapping?: Record<string, string>)
       cursor = response.next_cursor || undefined;
     } while (cursor);
 
-    // Filter out entries with empty titles or URLs and sort by ID descending
-    const validEntries = entries
-      .filter(entry => entry.title && entry.title !== 'Untitled' && entry.url)
-      .sort((a, b) => b.id - a.id);
+      // Filter out entries with empty titles or URLs and sort by ID descending
+      const validEntries = entries
+        .filter(entry => entry.title && entry.title !== 'Untitled' && entry.url)
+        .sort((a, b) => b.id - a.id);
 
-    return validEntries;
-  } catch (error) {
-    console.error('Error fetching entries from Notion:', error);
-    return [];
+      console.log(`✅ Notion API success on attempt ${attempt}, got ${validEntries.length} entries`);
+
+      // 更新缓存
+      cachedEntries = validEntries;
+      cacheTimestamp = Date.now();
+      console.log(`💾 Data cached for ${CACHE_DURATION / 1000}s`);
+
+      // 自动导出到 fallback 文件（仅在构建时）
+      if (process.env.NODE_ENV === 'production' || process.env.EXPORT_FALLBACK === 'true') {
+        try {
+          const fs = require('fs');
+          const path = require('path');
+
+          const fileContent = `import { RSWEntry } from '../types';
+
+// 从Notion数据库导出的真实数据作为缓存
+// 最后更新时间: ${new Date().toISOString()}
+// 数据条数: ${validEntries.length}
+export const FALLBACK_ENTRIES: RSWEntry[] = ${JSON.stringify(validEntries, null, 2)};`;
+
+          const filePath = path.join(process.cwd(), 'app', 'lib', 'fallback-data.ts');
+          fs.writeFileSync(filePath, fileContent, 'utf8');
+          console.log(`📄 Auto-exported ${validEntries.length} entries to fallback-data.ts`);
+        } catch (exportError) {
+          console.warn('⚠️ Failed to auto-export fallback data:', exportError);
+        }
+      }
+
+      return validEntries;
+
+    } catch (error: any) {
+      lastError = error;
+      console.error(`❌ Notion API attempt ${attempt}/${maxRetries} failed:`, error.message);
+
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // 指数退避，最大5秒
+        console.log(`⏳ Waiting ${delay}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
   }
+
+  console.error('❌ All Notion API attempts failed');
+
+  // 如果有缓存数据，即使过期也使用
+  if (cachedEntries) {
+    console.log('📦 Using expired cached data as fallback');
+    return cachedEntries;
+  }
+
+  console.log('📋 Using fallback data');
+  return [];
 }

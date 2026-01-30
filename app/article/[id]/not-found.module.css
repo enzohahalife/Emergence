@@ -1,0 +1,89 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+}
+
+.content {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 100%;
+}
+
+.title {
+  font-size: 6rem;
+  font-weight: 700;
+  color: #667eea;
+  margin: 0;
+  line-height: 1;
+  font-family: var(--font-merriweather);
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 1rem 0;
+  font-family: var(--font-merriweather);
+}
+
+.description {
+  font-size: 1rem;
+  color: #666;
+  margin: 1.5rem 0 2rem 0;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+}
+
+.homeButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.homeButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .content {
+    padding: 2rem;
+  }
+
+  .title {
+    font-size: 4rem;
+  }
+
+  .subtitle {
+    font-size: 1.25rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+  }
+}

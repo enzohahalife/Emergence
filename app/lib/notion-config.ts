@@ -7,6 +7,12 @@ export const FRONTEND_MATCHED_MAPPING = {
   author: 'Author',      // → entry.author_name
   date: 'Date',          // → entry.publication_date
   image: 'Image',        // → entry.screenshot & entry.og_image
+  content: 'notion-page-content',    // → entry.content
+
+  // SEO 字段
+  seoTitle: 'SEO Title',              // → entry.seo_title
+  seoDescription: 'SEO Description', // → entry.seo_description
+  keywords: 'Keywords',               // → entry.keywords
 };
 
 // 精简版 Notion 数据库字段映射（备用）
