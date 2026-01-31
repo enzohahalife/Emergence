@@ -1,0 +1,22 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "env": {
+    "NOTION_API_TOKEN": "@notion-api-token",
+    "NOTION_DATABASE_ID": "@notion-database-id"
+  },
+  "build": {
+    "env": {
+      "NOTION_API_TOKEN": "@notion-api-token",
+      "NOTION_DATABASE_ID": "@notion-database-id"
+    }
+  },
+  "functions": {
+    "app/**/*.{js,ts,tsx}": {
+      "maxDuration": 30
+    }
+  }
+}

@@ -37,18 +37,42 @@ export const metadata: Metadata = {
 };
 
 async function getEntries() {
+  // 在生产环境中添加更详细的日志
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  if (isProduction) {
+    console.log('🔍 Production environment detected');
+    console.log('📋 Environment check:', {
+      hasToken: !!process.env.NOTION_API_TOKEN,
+      hasDbId: !!process.env.NOTION_DATABASE_ID,
+      tokenPrefix: process.env.NOTION_API_TOKEN?.substring(0, 10) + '...',
+    });
+  }
+
   try {
     // 尝试从Notion获取数据
     const notionEntries = await getAllNotionEntries();
     if (notionEntries && notionEntries.length > 0) {
+      console.log(`✅ Successfully fetched ${notionEntries.length} entries`);
       return notionEntries;
+    } else {
+      console.warn('⚠️ Notion API returned empty array');
     }
   } catch (error) {
-    console.warn('Failed to fetch from Notion:', error);
+    console.error('❌ Failed to fetch from Notion:', error);
+
+    // 在生产环境中提供更详细的错误信息
+    if (isProduction) {
+      console.error('🔧 Debug info:', {
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorStack: error instanceof Error ? error.stack : 'No stack trace',
+        timestamp: new Date().toISOString(),
+      });
+    }
   }
 
   // 如果Notion API失败，返回空数组
-  console.warn('No data available from Notion API');
+  console.warn('📭 No data available from Notion API, returning empty array');
   return [];
 }
 
