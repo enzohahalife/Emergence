@@ -472,26 +472,6 @@ export async function getAllNotionEntries(fieldMapping?: Record<string, string>)
       cacheTimestamp = Date.now();
       console.log(`💾 Data cached for ${CACHE_DURATION / 1000}s`);
 
-      // 自动导出到 fallback 文件（仅在构建时）
-      if (process.env.NODE_ENV === 'production' || process.env.EXPORT_FALLBACK === 'true') {
-        try {
-          const fs = require('fs');
-          const path = require('path');
-
-          const fileContent = `import { RSWEntry } from '../types';
-
-// 从Notion数据库导出的真实数据作为缓存
-// 最后更新时间: ${new Date().toISOString()}
-// 数据条数: ${validEntries.length}
-export const FALLBACK_ENTRIES: RSWEntry[] = ${JSON.stringify(validEntries, null, 2)};`;
-
-          const filePath = path.join(process.cwd(), 'app', 'lib', 'fallback-data.ts');
-          fs.writeFileSync(filePath, fileContent, 'utf8');
-          console.log(`📄 Auto-exported ${validEntries.length} entries to fallback-data.ts`);
-        } catch (exportError) {
-          console.warn('⚠️ Failed to auto-export fallback data:', exportError);
-        }
-      }
 
       return validEntries;
 
@@ -507,14 +487,6 @@ export const FALLBACK_ENTRIES: RSWEntry[] = ${JSON.stringify(validEntries, null,
     }
   }
 
-  console.error('❌ All Notion API attempts failed');
-
-  // 如果有缓存数据，即使过期也使用
-  if (cachedEntries) {
-    console.log('📦 Using expired cached data as fallback');
-    return cachedEntries;
-  }
-
-  console.log('📋 Using fallback data');
+  console.log('❌ All Notion API attempts failed, returning empty array');
   return [];
 }

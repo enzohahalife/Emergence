@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { DEFAULT_SEO_CONFIG } from './lib/seo';
 import FeedManager from './components/FeedManager';
-import { FALLBACK_ENTRIES } from './lib/fallback-data';
 import { getAllNotionEntries } from './lib/notion';
 
 export const metadata: Metadata = {
@@ -45,11 +44,12 @@ async function getEntries() {
       return notionEntries;
     }
   } catch (error) {
-    console.warn('Failed to fetch from Notion, using fallback data:', error);
+    console.warn('Failed to fetch from Notion:', error);
   }
 
-  // 使用后备数据
-  return FALLBACK_ENTRIES;
+  // 如果Notion API失败，返回空数组
+  console.warn('No data available from Notion API');
+  return [];
 }
 
 export default async function Home() {

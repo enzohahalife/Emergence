@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getAllNotionEntries } from '../../lib/notion';
-import { FALLBACK_ENTRIES } from '../../lib/fallback-data';
 import { fetchNotionPageContent } from '../../lib/notion-content-fetcher';
 import { fetchNotionContentByTitleFuzzy } from '../../lib/notion-title-search';
 import { getArticleWithContent } from '../../lib/article-content-map';
@@ -21,9 +20,12 @@ async function getAllEntries(): Promise<RSWEntry[]> {
       return notionEntries;
     }
   } catch (error) {
-    console.warn('Failed to fetch from Notion, using fallback data:', error);
+    console.warn('Failed to fetch from Notion:', error);
   }
-  return FALLBACK_ENTRIES;
+
+  // 如果Notion API失败，返回空数组
+  console.warn('No data available from Notion API');
+  return [];
 }
 
 // 根据ID获取特定文章并获取其内容
