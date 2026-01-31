@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllNotionEntries, testNotionConnection } from '../../lib/notion';
+import { RSWEntry } from '../../types';
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,8 +12,8 @@ export async function GET(request: NextRequest) {
     const connectionTest = await testNotionConnection();
 
     // 获取数据
-    let entries = [];
-    let dataError = null;
+    let entries: RSWEntry[] = [];
+    let dataError: string | null = null;
     try {
       entries = await getAllNotionEntries();
     } catch (error) {

@@ -1,10 +1,11 @@
 import { getAllNotionEntries } from '../lib/notion';
 import { testNotionConnection } from '../lib/notion';
+import { RSWEntry } from '../types';
 
 export default async function TestPage() {
-  let connectionTest = null;
-  let entries = [];
-  let error = null;
+  let connectionTest: any = null;
+  let entries: RSWEntry[] = [];
+  let error: string | null = null;
 
   try {
     // 测试连接
@@ -13,7 +14,7 @@ export default async function TestPage() {
     // 获取数据
     entries = await getAllNotionEntries();
   } catch (err) {
-    error = err.message;
+    error = err instanceof Error ? err.message : 'Unknown error';
   }
 
   return (
